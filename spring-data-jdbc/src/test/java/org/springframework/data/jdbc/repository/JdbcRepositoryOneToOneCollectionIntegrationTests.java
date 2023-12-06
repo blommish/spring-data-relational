@@ -69,6 +69,19 @@ public class JdbcRepositoryOneToOneCollectionIntegrationTests {
         });
     }
 
+    @Test // GH-1684
+    public void saveAndLoadAnEntities() {
+
+        DummyEntity entity = repository.save(createDummyEntity());
+        DummyEntity entity2 = repository.save(createDummyEntity());
+
+        assertThat(repository.findById(entity.getId())).hasValueSatisfying(it -> {
+            assertThat(it.getId()).isEqualTo(entity.getId());
+            assertThat(it.getTest()).isEqualTo(entity.getTest());
+            assertThat(it.getDummyEntity2().getId()).isEqualTo(entity.getDummyEntity2().getId());
+        });
+    }
+
     private static DummyEntity createDummyEntity() {
         DummyEntity entity = new DummyEntity();
         entity.setTest("test");
@@ -126,8 +139,7 @@ public class JdbcRepositoryOneToOneCollectionIntegrationTests {
     }
 
     static class DummyEntity2 {
-        @Id
-        Long id;
+        Long id = 0L;
 
         public Long getId() {
             return id;
